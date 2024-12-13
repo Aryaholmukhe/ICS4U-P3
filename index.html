@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <h3>Algorithm Analysis</h3>
+    <table border="1">
+      <tr>
+        <th>Algorithm</th>
+        <th>Best Case</th>
+        <th>Worst Case</th>
+        <th>Why Best Case is Fast</th>
+        <th>Why Worst Case is Slow</th>
+      </tr>
+      <tr>
+        <td>Bubble Sort</td>
+        <td>O(n)</td>
+        <td>O(n²)</td>
+        <td>The list is already sorted, requiring only one pass with no swaps.</td>
+        <td>The list is sorted in reverse order, requiring the maximum number of comparisons and swaps.</td>
+      </tr>
+      <tr>
+        <td>Quick Sort</td>
+        <td>O(n log n)</td>
+        <td>O(n²)</td>
+        <td>The pivot splits the list into two equal halves at each step, minimizing recursion depth.</td>
+        <td>The pivot is always the smallest or largest element, leading to the most unbalanced partitions and maximum recursion depth.</td>
+      </tr>
+      <tr>
+        <td>Binary Search</td>
+        <td>O(1)</td>
+        <td>O(log n)</td>
+        <td>The target is found on the first comparison (middle of the sorted list).</td>
+        <td>The search repeatedly halves the list until the target is found or the list is exhausted, taking log(n) steps.</td>
+      </tr>
+      <tr>
+        <td>Linear Search</td>
+        <td>O(1)</td>
+        <td>O(n)</td>
+        <td>The target is the first element in the list, requiring just one comparison.</td>
+        <td>The search must check every element, requiring n comparisons if the target is the last element or not present.</td>
+      </tr>
+    </table>
+    <p>
+      <strong>Binary Search:</strong> Efficient for sorted lists; halves the search space with each step. Best case: target is at the middle. Worst case: logarithmic steps are needed.<br>
+      <strong>Linear Search:</strong> Works on unsorted lists. Best case: target is the first element. Worst case: must traverse the entire list.
+    </p>
+    <script src="sketch.js"></script>
+</body>
+</html>
