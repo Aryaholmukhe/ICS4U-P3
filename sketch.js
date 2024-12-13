@@ -17,6 +17,7 @@ function preload() {
   dataset = loadTable("Employment.csv", "csv", "header");
 }
 
+// Sorting for the visualization
 function bubbleSortWithIndicesVisual(arr) {
   const indices = Array.from({ length: arr.length }, (_, i) => i);
   bubbleSortValues = arr.slice(); // Copy values for bubble sort visualization
@@ -24,7 +25,7 @@ function bubbleSortWithIndicesVisual(arr) {
   return indices;
 }
 
-
+// Bubble sorting to find the indices of the necessary values
 function bubbleSortWithIndices(arr) {
   const indices = Array.from({ length: arr.length }, (_, i) => i);
 
@@ -40,60 +41,63 @@ function bubbleSortWithIndices(arr) {
   return indices;
 }
 
+// Function to swap two elements in an array
 const swap = (arr, leftIndex, rightIndex) => {
-  let temp = arr[leftIndex];
-  arr[leftIndex] = arr[rightIndex];
-  arr[rightIndex] = temp;
+  let temp = arr[leftIndex]; // Temporarily store the value at leftIndex
+  arr[leftIndex] = arr[rightIndex]; // Replace leftIndex value with rightIndex value
+  arr[rightIndex] = temp; // Replace rightIndex value with temp (initial leftIndex value)
 };
 
+// Function to partition the array for quicksort
 const partition = (arr, indices, left, right) => {
-  let pivot = arr[Math.floor((right + left) / 2)];
-  let i = left;
-  let j = right;
+  let pivot = arr[Math.floor((right + left) / 2)]; // Choose pivot element (middle of the array)
+  let i = left; // Start index
+  let j = right; // End index
   while (i <= j) {
     while (arr[i] < pivot) {
-      i++;
+      i++; // Increment i until we find an element greater than or equal to pivot
     }
     while (arr[j] > pivot) {
-      j--;
+      j--; // Decrement j until we find an element less than or equal to pivot
     }
     if (i <= j) {
       swap(arr, i, j); // Swap elements in the array
       swap(indices, i, j); // Swap corresponding indices
-      i++;
-      j--;
+      i++; // Move i to the right
+      j--; // Move j to the left
     }
   }
-  return i;
+  return i; // Return the index of the pivot
 };
 
+// Function to perform quicksort on the array
 const quickSortWithIndices = (arr, left = 0, right = arr.length - 1, indices = arr.map((_, i) => i)) => {
   let index;
   if (arr.length > 1) {
-    index = partition(arr, indices, left, right);
+    index = partition(arr, indices, left, right); // Partition the array
     if (left < index - 1) {
-      quickSortWithIndices(arr, left, index - 1, indices);
+      quickSortWithIndices(arr, left, index - 1, indices); // Recursively sort the left subarray
     }
     if (index < right) {
-      quickSortWithIndices(arr, index, right, indices);
+      quickSortWithIndices(arr, index, right, indices); // Recursively sort the right subarray
     }
   }
-  return indices;
+  return indices; // Return the array of indices
 };
 
+// Function to sort an array based on a provided array of indices
 function sortArrayByIndex(array, indexArray) {
   const sortedArray = [];
 
   for (const index of indexArray) {
-    sortedArray.push(array[index]);
+    sortedArray.push(array[index]); // Push elements to sortedArray based on indexArray
   }
 
-  return sortedArray;
+  return sortedArray; // Return the sorted array
 }
 
 
-
-// Binary Search Function to find the country from the dataset for efficiency. 
+// Binary Search Function to find the country from the dataset efficiently 
 function binarySearch(arr, target, key) {
   let left = 0;
   let right = arr.length - 1;
@@ -110,6 +114,112 @@ function binarySearch(arr, target, key) {
   }
   return -1;
 }
+
+// Sorting to be visually displayed
+async function bubbleSortVisual(arr) {
+  // Outer loop to traverse each element in the array
+  for (let i = 0; i < arr.length; i++) {
+    // Inner loop for comparison and swapping
+    for (let j = 0; j < arr.length - i - 1; j++) {
+      // Compare current element with the next element
+      if (arr[j] > arr[j + 1]) {
+        // Swap elements with visual effect
+        await swapWithVisual(arr, j, j + 1, bubbleStates);
+      }
+    }
+  }
+}
+
+// Function to swap elements with visual effect
+async function swapWithVisual(arr, i, j, stateArray) {
+  let speed = 1000 - speedSlider.value(); // Adjust speed based on slider value
+  await sleep(speed); // Pause for visual effect
+  let temp = arr[i]; // Temporarily store the value at index i
+  arr[i] = arr[j]; // Replace value at index i with value at index j
+  arr[j] = temp; // Replace value at index j with the temporarily stored value
+  stateArray[i] = 1; // Mark element at index i as swapped
+  stateArray[j] = 1; // Mark element at index j as swapped
+  await sleep(speed); // Pause for visual effect
+  stateArray[i] = -1; // Reset state of element at index i
+  stateArray[j] = -1; // Reset state of element at index j
+}
+
+// Function to perform quick sort with visual effect
+async function quickSortWithVisual(start, end) {
+  // Base case: if start index is greater than end index, return
+  if (start > end) {
+    return;
+  }
+  // Partition the array and get the pivot index
+  let index = await partitionWithVisual(start, end);
+  states[index] = -1; // Reset state of pivot element
+  // Recursively sort the left and right subarrays concurrently
+  await Promise.all([
+    quickSortWithVisual(start, index - 1), 
+    quickSortWithVisual(index + 1, end)
+  ]);
+}
+
+// Function to partition the array with visual effect
+async function partitionWithVisual(start, end) {
+  // Mark elements between start and end as being partitioned
+  for (let i = start; i < end; i++) {
+    states[i] = 1;
+  }
+  let pivotIndex = start; // Choose start as the initial pivot index
+  states[pivotIndex] = 0; // Mark pivot element
+  let pivotElement = values[end]; // Choose end element as pivot
+  // Loop through elements from start to end-1
+  for (let i = start; i < end; i++) {
+    // If current element is less than pivot, swap it with the element at pivotIndex
+    if (values[i] < pivotElement) {
+      await swapWithVisual(values, i, pivotIndex, states);
+      states[pivotIndex] = -1; // Reset state of swapped element
+      pivotIndex++; // Move pivot index to the right
+      states[pivotIndex] = 0; // Mark new pivot element
+    }
+  }
+  // Swap pivot element with the element at pivotIndex
+  await swapWithVisual(values, end, pivotIndex, states);
+  // Reset states of all elements except the pivot
+  for (let i = start; i < end; i++) {
+    if (i != pivotIndex) {
+      states[i] = -1;
+    }
+  }
+  return pivotIndex; // Return the pivot index
+}
+
+
+function simulateSorting() {
+  // Simulate sorting animations
+  loop();
+}
+
+function visualizeSorting(values, states, visualizationType) {
+  try {
+    const barWidth = 4;
+    const yOffset = visualizationType === "BubbleSort" ? height / 2 : 0; // Set yOffset for Bubble Sort
+    for (let k = 0; k < values.length; k++) {
+      stroke(255);
+      if (states[k] === 1) {
+        fill("#ff7f0e"); // Highlight swapped bars
+      } else if (states[k] === 0) {
+        fill("#1f77b4"); // Highlight pivot
+      } else {
+        fill(237, 129, 156); // Normal bars
+      }
+      rect(k * barWidth, yOffset + (height / 2.5 ), barWidth, -values[k]); // Adjusted yOffset for positioning
+    }
+  } catch (error) {
+    console.error("Error in visualizeSorting:", error);
+  }
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 
 // Function to create input and search button
 function createSearchInput() {
@@ -130,15 +240,14 @@ function createSearchInput() {
   });
 }
 
-
+// Buttons and inputs to control the sorts and searches
 function createButtons() {
-  createSearchInput(); // Add this line to create input and button for search
+  createSearchInput(); 
   const bubbleSortButton = createButton("Sort Ascending (Bubble Sort)");
   bubbleSortButton.position(800, 600);
   bubbleSortButton.mousePressed(async () => {
     let sortedIndices = await bubbleSortWithIndices(totalValues);
     console.log(sortedIndices)
-    // data = sortArrayByIndex(data, sortedIndices);
     console.log(sortArrayByIndex(data, sortedIndices));
 
     d3RadialChart(sortArrayByIndex(data, sortedIndices));
@@ -173,98 +282,10 @@ function createButtons() {
   });
 }
 
+// Create slider to control animation speed
 function createSliders() {
-  speedSlider = createSlider(1, 1000, 25); // Create slider to control animation speed
+  speedSlider = createSlider(1, 1000, 25); 
   speedSlider.position(800, 340);
-}
-
-
-async function bubbleSortVisual(arr) {
-  for (let i = 0; i < arr.length; i++) {
-    for (let j = 0; j < arr.length - i - 1; j++) {
-      if (arr[j] > arr[j + 1]) {
-        await swapWithVisual(arr, j, j + 1, bubbleStates);
-      }
-    }
-  }
-}
-
-async function swapWithVisual(arr, i, j, stateArray) {
-  let speed = 1000 - speedSlider.value(); // Invert the slider value to make the animation faster with higher values
-  await sleep(speed);
-  let temp = arr[i];
-  arr[i] = arr[j];
-  arr[j] = temp;
-  stateArray[i] = 1;
-  stateArray[j] = 1;
-  await sleep(speed);
-  stateArray[i] = -1;
-  stateArray[j] = -1;
-}
-
-async function quickSortWithVisual(start, end) {
-  if (start > end) {
-    return;
-  }
-  let index = await partitionWithVisual(start, end);
-  states[index] = -1;
-  await Promise.all(
-    [quickSortWithVisual(start, index - 1), 
-     quickSortWithVisual(index + 1, end)
-    ]);
-}
-
-async function partitionWithVisual(start, end) {
-  for (let i = start; i < end; i++) {
-    states[i] = 1;
-  }
-  let pivotIndex = start;
-  states[pivotIndex] = 0;
-  let pivotElement = values[end];
-  for (let i = start; i < end; i++) {
-    if (values[i] < pivotElement) {
-      await swapWithVisual(values, i, pivotIndex, states);
-      states[pivotIndex] = -1;
-      pivotIndex++;
-      states[pivotIndex] = 0;
-    }
-  }
-  await swapWithVisual(values, end, pivotIndex, states);
-  for (let i = start; i < end; i++) {
-    if (i != pivotIndex) {
-      states[i] = -1;
-    }
-  }
-  return pivotIndex;
-}
-
-function simulateSorting() {
-  // Simulate sorting animations
-  loop();
-}
-
-function visualizeSorting(values, states, visualizationType) {
-  try {
-    const barWidth = 4;
-    const yOffset = visualizationType === "BubbleSort" ? height / 2 : 0; // Set yOffset for Bubble Sort
-    for (let k = 0; k < values.length; k++) {
-      stroke(255);
-      if (states[k] === 1) {
-        fill("#ff7f0e"); // Highlight swapped bars
-      } else if (states[k] === 0) {
-        fill("#1f77b4"); // Highlight pivot
-      } else {
-        fill(237, 129, 156); // Normal bars
-      }
-      rect(k * barWidth, yOffset + (height / 2.5 ), barWidth, -values[k]); // Adjusted yOffset for positioning
-    }
-  } catch (error) {
-    console.error("Error in visualizeSorting:", error);
-  }
-}
-
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 // p5.js setup
@@ -298,9 +319,6 @@ function setup() {
     }
   }
 
-
-    serviceData = dataset.getColumn(4).slice(901); // Assuming column 6 has service data
-  
     // Process the data
     for (let i = 0; i < countryData.length; i++) {
       if (yearData[i] === "2021") {
@@ -311,12 +329,6 @@ function setup() {
           countryEntry = { name: countryName, values: [null, null], total, service: 0 };
           data.push(countryEntry);
           index.push(i);
-        }
-  
-        // Assign the appropriate value and update countryEntry.total
-        if (typeData[i] === "Employment by industry: Service (%)") {
-          countryEntry.service = parseFloat(serviceData[i]) || 0; // Service Percentage
-          countryEntry.total += parseFloat(serviceData[i]);
         }
       }
     }
